@@ -1,0 +1,40 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "@assets": [
+                "./src/assets/index.ts"
+            ],
+            "@components/*": [
+                "./src/components/*"
+            ],
+            "@common": [
+                "./src/components/common/index.ts"
+            ],
+            "@animations": [
+                "./src/components/animations/index.ts"
+            ],
+            "@contexts": [
+                "./src/contexts/index.ts"
+            ],
+            "@enums": [
+                "./src/enums/index.ts"
+            ],
+            "@hooks": [
+                "./src/hooks/index.ts"
+            ],
+            "@layouts": [
+                "./src/layouts/index.ts"
+            ],
+            "@models": [
+                "./src/models/index.ts"
+            ],
+            "@pages": [
+                "./src/pages/index.ts"
+            ],
+            "@providers": [
+                "./src/providers/index.ts"
+            ],
+        }
+    }
+}
