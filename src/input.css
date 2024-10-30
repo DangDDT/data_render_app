@@ -7,3 +7,54 @@
     @apply rounded-[12px];
   }
 }
+/* 
+@keyframes moveLeft {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes moveRight {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+} */
+
+.grid-container {
+  display: grid;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.grid-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white;
+  border-radius: 4px;
+  text-shadow: 0px 0px 2.5px rgba(0, 0, 0, 0.5);
+  /* border: 1px solid white; */
+}
+
+.card-item {
+  display: relative;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+}
+
+.perspective-1000 {
+  perspective: 1000px; /* Thiết lập khoảng cách để tạo hiệu ứng 3D */
+}

@@ -30,6 +30,7 @@ export default defineConfig(() => {
         "@models": resolve(__dirname, "src/models/index.ts"),
         "@pages": resolve(__dirname, "src/pages/index.ts"),
         "@providers": resolve(__dirname, "src/providers/index.ts"),
+        "@services": resolve(__dirname, "src/services/index.ts"),
       },
     },
     build: {
