@@ -1,6 +1,6 @@
 // import { Dashboard, Home, Profile } from "@pages";
 
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
 import { WelcomePage } from "@pages";
 
@@ -10,12 +10,8 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       {
-        element: <Navigate to="home" replace />,
-        index: true,
-      },
-      {
         element: <WelcomePage />,
-        path: "home",
+        path: "/",
       },
     ],
   },
