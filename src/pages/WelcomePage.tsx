@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
 import { useModal } from "@hooks";
+import { url } from "inspector";
 
 interface GuestTable {
   users: UserModel[];
@@ -103,6 +104,7 @@ const RowGuest: React.FC<{
       return;
     } else {
       editGuest({ id: user.id, name });
+      setName("");
     }
   };
 
