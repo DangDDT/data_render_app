@@ -12,9 +12,8 @@ export default defineConfig(() => {
     plugins: [
       react({ tsDecorators: true }),
       zipPack({
-        inDir: resolve(__dirname, "build"),
-        outDir: resolve(__dirname, "output"),
-        outFileName: `${__dirname.split("/").pop()}-${Date.now()}.zip`,
+        inDir: resolve(__dirname, "dist"),
+        outDir: resolve(__dirname, "dist"),
       }),
     ],
     resolve: {
@@ -38,7 +37,7 @@ export default defineConfig(() => {
       chunkSizeWarningLimit: 1024 * 10 * 10,
       assetsDir: "assets", // Thư mục lưu trữ tệp tĩnh sau khi xây dựng
       manifest: true,
-      outDir: "build", // Thư mục lưu trữ tệp xây dựng
+      outDir: "dist", // Thư mục lưu trữ tệp xây dựng
     },
     optimizeDeps: {
       include: ["esm-dep > cjs-dep"],
