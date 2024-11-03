@@ -39,66 +39,71 @@ const MovingLines = React.memo(({ users, lineSize }: MovingLinesProps) => {
       {userlines.map((users, index) => {
         console.log(users);
         const type = index;
-        const type2 = index % 15;
+        const type2 = index % 16;
         const fontSize = type2 * type * 0.0143172 + 10.315;
         const zIndex = index;
         let top = type * 55 + 30;
+        let direction = type2 % 4 === 0 ? 1 : -1;
         if (top > window.innerHeight - 100) {
-          top = window.innerHeight - type2 * 100;
+          top = window.innerHeight - type2 * 110.18721;
+          direction = direction * -1;
         }
-        const direction = type2 % 3 === 0 ? 1 : -1;
+
         let speed = 1.2;
         switch (type2) {
           case 0:
-            speed = 1.4376457;
+            speed = 2.4376457;
             break;
           case 1:
-            speed = 1.4351;
+            speed = 2.4351;
             break;
           case 2:
-            speed = 1.6126435;
+            speed = 2.6126435;
             break;
           case 3:
-            speed = 1.823112;
+            speed = 2.823112;
             break;
           case 4:
-            speed = 1.742323;
+            speed = 2.742323;
             break;
           case 5:
-            speed = 1.275345;
+            speed = 2.275345;
             break;
           case 6:
-            speed = 1.9172;
+            speed = 2.9172;
             break;
           case 7:
-            speed = 1.412435;
+            speed = 2.412435;
             break;
           case 8:
-            speed = 1.86341;
+            speed = 2.86341;
             break;
           case 9:
-            speed = 1.95325;
+            speed = 2.95325;
             break;
           case 10:
-            speed = 1.4421;
+            speed = 2.9421;
             break;
           case 11:
-            speed = 1.84543;
+            speed = 2.14543;
             break;
           case 12:
-            speed = 1.7156;
+            speed = 2.7156;
             break;
           case 13:
-            speed = 1.98436;
+            speed = 2.98436;
             break;
           case 14:
-            speed = 1.8826;
+            speed = 2.8826;
+            break;
+          case 15:
+            speed = 2.471261;
             break;
           default:
-            speed = 1.171261;
+            speed = 2.171261;
             break;
         }
-        speed = speed  * type2 * 0.017126389 + 0.011518 + (15 - type2) * 0.04;
+        speed = speed * 2 * type2 * 0.017126389 + 0.021518 + (16 - type2) * 0.03;
         return (
           <UserLine
             key={index}
