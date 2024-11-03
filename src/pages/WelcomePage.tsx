@@ -170,6 +170,12 @@ const UserLine = React.memo(
             if (!users[i + 1] || !users[i + 1].name) {
               numberLine = -1;
             }
+            let usersLength = 0;
+            for (let j = 0; j < users.length; j++) {
+              if (users[j] && users[j].name) {
+                usersLength++;
+              }
+            }
             return (
               <>
                 {i === 0 && (
@@ -193,7 +199,7 @@ const UserLine = React.memo(
                     )}
                   </div>
                 )}
-                {i === users.length - 1 && <div className="flex">
+                {i === usersLength-1 && <div className="flex">
                   <LineWithCircleRight />
                 </div>}
               </>
