@@ -1,184 +1,402 @@
+import { RoomModel, UserModel } from "@models";
 import { db } from "@services";
-import { onChildAdded, onValue, ref } from "firebase/database";
-import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
-import UserModel from "src/models/user";
-import classNames from "classnames";
+import { getDatabase, onValue, ref, remove, set } from "firebase/database";
+import { useEffect, useState } from "react";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
+import { useModal } from "@hooks";
+import { log } from "console";
 
-type MovingLinesProps = {
-  names: string[];
-  lineSize: number;
-};
+interface GuestTable {
+  users: UserModel[];
+  addGuestToRoom: (guest: UserModel) => void;
+  editGuestInRoom: (guest: UserModel) => void;
+  deleteGuestInRoom: (guest: UserModel) => void;
+}
 
-const MovingLines = ({ names, lineSize }: MovingLinesProps) => {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const numOfLines = Math.ceil(names.length / lineSize);
-  const namelines = useMemo(() => {
-    const namelines: string[][] = [];
-    for (let i = 0; i < numOfLines; i++) {
-      for (let j = i * lineSize; j < i * lineSize + lineSize; j++) {
-        namelines[i] = [...(namelines[i] || []), names[j]];
-      }
-    }
-    return namelines;
-  }, [names, lineSize]);
+interface RoomModal {
+  rooms: RoomModel[];
+  pickedRoom: RoomModel | null;
+  addRoom: (room: RoomModel) => void;
+  onPickRoom: (room: RoomModel) => void;
+}
 
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
+const EDIT_SUCCESS_NOTI = "Sửa thành công!";
+const FAILURE_NOTI = "Có lỗi xảy ra, vui lòng thử lại!";
 
-    const lines = Array.from(container.children) as HTMLDivElement[];
+const ADD_SUCCESS_NOTI = "Thêm thành công";
+const DELETE_SUCCESS_NOTI = "Xóa thành công!";
 
-    lines.forEach((line, index) => {
-      const direction = index % 2 === 0 ? 1 : -1;
-      var speed = 1.2;
-      switch (index % 3) {
-        case 0:
-          speed = 1.2;
-          break;
-        case 1:
-          speed = 1.5;
-          break;
-        case 2:
-          speed = 1.8;
-          break;
-        default:
-          speed = 1.2;
-          break;
-      }
-      let positionX = direction > 0 ? -100 : window.innerWidth;
+const RoomModal: React.FC<RoomModal> = ({
+  rooms,
+  pickedRoom,
+  addRoom,
+  onPickRoom,
+}) => {
+  const [room, setRoom] = useState<string>("");
 
-      const animateLine = () => {
-        positionX += direction * speed;
-
-        if (direction > 0 && positionX >= window.innerWidth) {
-          positionX = -line.offsetWidth;
-        } else if (direction < 0 && positionX <= -line.offsetWidth) {
-          positionX = window.innerWidth;
-        }
-
-        line.style.transform = `translateX(${positionX}px)`;
-        requestAnimationFrame(animateLine);
+  const onAddRoom = () => {
+    if (room === "") {
+      return;
+    } else {
+      const roomObj: RoomModel = {
+        id: rooms.length + 1 + "",
+        name: room,
       };
+      addRoom(roomObj);
+      setRoom("");
+    }
+  };
 
-      animateLine();
-    });
-  }, []);
-
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      onAddRoom();
+    } else {
+      return;
+    }
+  };
   return (
-    <div
-      ref={containerRef}
-      className="relative h-screen w-full overflow-hidden bg-gray-900"
-    >
-      {namelines.map((names, index) => {
-        var fontSize = 20;
-        var top = names.length * 2 + index * 100;
-        var zIndex = index;
-        switch (index % 3) {
-          case 0:
-            fontSize = 20;
-            break;
-          case 1:
-            fontSize = 30;
-            break;
-          case 2:
-            fontSize = 40;
-            break;
-          default:
-            fontSize = 20;
-            break;
-        }
-        switch (index % 4) {
-          case 0:
-            top = names.length * 2 + index * 100;
-            break;
-          case 1:
-            top = names.length * 2 + index * 200;
-            break;
-          case 2:
-            top = names.length * 2 + index * 300;
-            break;
-          case 3:
-            top = names.length * 2 + index * 400;
-            break;
-          default:
-            top = names.length * 2 + index * 100;
-            break;
-        }
-        switch (index % 5) {
-          case 0:
-            zIndex = index;
-            break;
-          case 1:
-            zIndex = index * 2;
-            break;
-          case 2:
-            zIndex = index * 3;
-            break;
-          case 3:
-            zIndex = index * 4;
-            break;
-          case 4:
-            zIndex = index * 5;
-            break;
-          default:
-            zIndex = index;
-            break;
-        }
-        if (top > window.innerHeight) {
-          top = window.innerHeight - index * 100;
-        }
-        return (
-          <div
-            key={index}
-            className="absolute whitespace-nowrap font-bold text-white"
-            style={{
-              top: top,
-              zIndex: zIndex,
-              fontSize: `${fontSize}px`,
-            }}
-          >
-            <div className="inline-block">
-              {names.map((name, i) => (
-                <div key={i} className="mx-12 inline-block">
-                  {name}
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      })}
+    <div>
+      <div className="mb-5 flex">
+        <input
+          type="text"
+          placeholder="Nhập tên"
+          value={room}
+          maxLength={40}
+          onKeyDown={(e) => handleKeyDown(e)}
+          onChange={(e) => setRoom(e.target.value)}
+          className="w-full rounded border border-gray-300 p-2 transition duration-200 focus:border-blue-500 focus:outline-none"
+        />
+        <button
+          onClick={onAddRoom}
+          className={`ml-2 rounded border border-blue-500 bg-blue-500 px-4 text-white hover:bg-blue-600`}
+        >
+          Tạo mới
+        </button>
+      </div>
+      <div className="flex w-96 flex-wrap">
+        {rooms?.map((room, idx) => {
+          const isSelected = pickedRoom?.id === room.id;
+          return (
+            <button
+              key={idx}
+              onClick={() => onPickRoom(room)}
+              className={`ml-2 mt-5 rounded border ${isSelected ? "border-blue-500 bg-blue-500 hover:bg-blue-600" : "border-gray-500 bg-gray-500 hover:bg-gray-600"} px-4 py-2 text-white`}
+            >
+              {room?.name}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 };
 
-const removeDuplicates = (arr: UserModel[]) => {
-  return arr.filter((v, i, a) => a.findIndex((t) => t.id === v.id) === i);
+const RowGuest: React.FC<{
+  user: UserModel;
+  editGuest: (user: UserModel) => void;
+  deleteGuest: (user: UserModel) => void;
+}> = ({ user, editGuest, deleteGuest }) => {
+  const [name, setName] = useState<string>("");
+
+  const handleEditGuest = () => {
+    if (name === "") {
+      return;
+    } else {
+      editGuest({ id: user.id, name });
+    }
+  };
+
+  return (
+    <div className="flex">
+      <input
+        className="w-full px-2 text-black focus:outline-0"
+        value={name || user.name}
+        onChange={(e) => setName(e.target.value)}
+      />
+      <button
+        disabled={name === "" ? true : false}
+        onClick={handleEditGuest}
+        className="ml-2 rounded border border-blue-500 bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+      >
+        Sửa
+      </button>
+
+      <button
+        onClick={() => deleteGuest(user)}
+        className="ml-2 rounded border border-red-500 bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+      >
+        Xóa
+      </button>
+    </div>
+  );
+};
+
+const GuestTable: React.FC<GuestTable> = ({
+  users,
+  addGuestToRoom,
+  editGuestInRoom,
+  deleteGuestInRoom,
+}) => {
+  const [guest, setGuest] = useState<string>("");
+
+  const onSetGuest = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setGuest(e.target.value);
+  };
+
+  const addGuest = () => {
+    const guestObj: UserModel = {
+      id: users.length + 1 + "",
+      name: guest,
+    };
+    addGuestToRoom(guestObj);
+    setGuest("");
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      addGuest();
+    } else {
+      return;
+    }
+  };
+
+  return (
+    <div className="p-6">
+      <div className="mb-10 flex items-center gap-5">
+        <input
+          type="text"
+          placeholder="Nhập tên"
+          value={guest}
+          maxLength={40}
+          onKeyDown={handleKeyDown}
+          onChange={(e) => onSetGuest(e)}
+          className="w-full rounded border border-gray-300 p-2 transition duration-200 focus:border-blue-500 focus:outline-none"
+        />
+        <button
+          onClick={addGuest}
+          className="rounded border border-blue-500 bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+        >
+          Thêm
+        </button>
+      </div>
+
+      <table className="w-full border border-gray-300">
+        <thead>
+          <tr className="bg-gray-100">
+            <th className="border border-gray-300 p-2">ID</th>
+            <th className="border border-gray-300 p-2">Người tham gia</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users?.map((user, index) => (
+            <tr key={index} className="border-b border-gray-300">
+              <td className="border border-gray-300 p-2 text-center text-white">
+                {user.id}
+              </td>
+              <td className="border border-gray-300 p-2">
+                {/* <input
+                  className="w-full text-black focus:border-[1.5px] focus:outline-0"
+                  value={user && user.name}
+                  onSubmit={() => {}}
+                  onChange={(name) => editGuestInRoom({ id: user.id, name })}
+                /> */}
+
+                <RowGuest
+                  user={user}
+                  editGuest={editGuestInRoom}
+                  deleteGuest={deleteGuestInRoom}
+                />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 };
 
 const WelcomePage: React.FC = () => {
   const [users, setUsers] = useState<UserModel[]>([]);
+  const [rooms, setRooms] = useState<RoomModel[]>([]);
+  const [pickedRoom, setPickedRoom] = useState<RoomModel | null>(null);
+
+  const { showModal, Modal } = useModal();
 
   useEffect(() => {
-    const dataRef = ref(db, "/users");
+    const refRoom = ref(db, "/rooms");
 
-    const unsubscribe = onChildAdded(dataRef, (snapshot) => {
-      const newUser = snapshot.val();
-      var newUsers = removeDuplicates([...users, newUser]);
-      newUsers.sort((a, b) => a.name.localeCompare(b.name));
-      setUsers(newUsers);
+    const unSubRoomRef = onValue(refRoom, (snapshot) => {
+      const dataRooms = snapshot.val();
+
+      // Lấy tất cả giá trị thành mảng nếu là đối tượng
+      const allRooms: RoomModel[] = dataRooms ? Object.values(dataRooms) : [];
+
+      setRooms(allRooms);
     });
-
-    console.log(users);
-
     return () => {
-      unsubscribe();
+      unSubRoomRef();
     };
   }, []);
 
+  useEffect(() => {
+    if (pickedRoom !== null) {
+      const dataRef = ref(db, `/rooms/${pickedRoom?.id}/users`);
+
+      const unsubscribe = onValue(dataRef, (snapshot) => {
+        setUsers([]);
+        const data = snapshot.val();
+        // Lấy tất cả giá trị thành mảng nếu là đối tượng
+        const allUsers: UserModel[] = data ? Object.values(data) : [];
+        // desc sort all users by id
+        allUsers.sort((a, b) => parseInt(b.id) - parseInt(a.id));
+        setUsers(allUsers);
+      });
+
+      return () => {
+        unsubscribe();
+      };
+    }
+  }, [pickedRoom]);
+
+  const postDataToFirebase = (data: UserModel) => {
+    try {
+      const db = getDatabase(); // Kết nối với database
+      const dataRef = ref(db, `/rooms/${pickedRoom?.id}/users/${data.id}`); // Đặt đường dẫn tới nơi bạn muốn lưu dữ liệu, ví dụ: 'users'
+
+      set(dataRef, {
+        id: data.id,
+        name: data.name,
+      })
+        .then(() => {
+          notify(ADD_SUCCESS_NOTI, true);
+        })
+        .catch(() => {
+          notify(FAILURE_NOTI, false);
+        });
+    } catch (error) {
+      console.error("Error posting data:", error);
+    }
+  };
+
+  const deleteGuest = (data: UserModel) => {
+    try {
+      const db = getDatabase();
+      const dataRef = ref(db, `/rooms/${pickedRoom?.id}/users/${data.id}`);
+
+      remove(dataRef)
+        .then(() => {
+          notify(DELETE_SUCCESS_NOTI, true);
+        })
+        .catch(() => {
+          notify(FAILURE_NOTI, false);
+        });
+    } catch (error) {
+      console.error("Error deleting data:", error);
+    }
+  };
+
+  const editGuestInRoom = (data: UserModel) => {
+    try {
+      const db = getDatabase();
+      const dataRef = ref(db, `/rooms/${pickedRoom?.id}/users/${data.id}`);
+
+      set(dataRef, {
+        id: data.id,
+        name: data.name,
+      })
+        .then(() => {
+          notify(EDIT_SUCCESS_NOTI, true);
+        })
+        .catch(() => {
+          notify(FAILURE_NOTI, false);
+        });
+    } catch (error) {
+      console.error("Error editing data:", error);
+    }
+  };
+
+  const createRoom = (room: RoomModel) => {
+    try {
+      const db = getDatabase();
+      const dataRef = ref(db, `/rooms/${room.id}`);
+
+      set(dataRef, {
+        id: room.id,
+        name: room.name,
+      })
+        .then(() => {
+          notify(ADD_SUCCESS_NOTI, true);
+        })
+        .catch(() => {
+          notify(FAILURE_NOTI, false);
+        });
+    } catch (error) {
+      console.error("Error creating room:", error);
+    }
+  };
+
+  const notify = (textStatus: string, isSuccess: boolean) => {
+    switch (isSuccess) {
+      case true:
+        return toast.success(textStatus, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      case false:
+        return toast.error(textStatus, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+    }
+  };
+
+  const onPickRoom = (room: RoomModel) => {
+    setPickedRoom(room);
+    showModal();
+  };
+
   return (
-    <section className="flex h-screen items-center bg-gray-50 dark:bg-gray-700">
-      <div className="flex w-full flex-col items-center">
-        <MovingLines names={users.map((u) => u.name)} lineSize={1} />
+    <section className="flex items-center justify-center bg-gray-50 dark:bg-gray-700">
+      <div className="flex min-h-screen w-full flex-col items-center">
+        <div className="flex justify-between">
+          <button
+            onClick={showModal}
+            className={`ml-2 rounded border border-blue-500 bg-blue-500 px-4 py-2 text-white hover:bg-blue-600`}
+          >
+            {pickedRoom === null ? "Chọn phòng" : pickedRoom.name}
+          </button>
+        </div>
+        {pickedRoom === null ? null : (
+          <GuestTable
+            users={users}
+            addGuestToRoom={postDataToFirebase}
+            editGuestInRoom={editGuestInRoom}
+            deleteGuestInRoom={deleteGuest}
+          />
+        )}
+
+        <ToastContainer />
+
+        <Modal>
+          <RoomModal
+            rooms={rooms}
+            pickedRoom={pickedRoom}
+            addRoom={createRoom}
+            onPickRoom={onPickRoom}
+          />
+        </Modal>
       </div>
     </section>
   );
