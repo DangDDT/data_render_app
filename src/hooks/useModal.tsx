@@ -19,10 +19,12 @@ const useModal = () => {
         }: {
           children: React.ReactNode;
         } & React.ComponentProps<"dialog">) => (
-          <dialog ref={modelRef} className="modal" {...props}>
-            <div className="modal-box">{children}</div>
+          <dialog ref={modelRef} className="modal rounded-md p-4" {...props}>
+            <div className="modal-box p-12">{children}</div>
             <form method="dialog" className="modal-backdrop">
-              <button>close</button>
+              <button className="float-end rounded-md bg-gray-500 p-2 text-white">
+                Đóng
+              </button>
             </form>
           </dialog>
         ),

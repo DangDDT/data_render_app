@@ -13,3 +13,5 @@ export {
   isSuccess,
 } from "./stateData";
 export { default as SampleModel } from "./sampleModel";
+export { default as UserModel } from "./user";
+export { default as RoomModel } from "./room";

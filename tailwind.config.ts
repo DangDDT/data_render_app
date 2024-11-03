@@ -8,7 +8,7 @@ export default {
       keyframes: {
         scale: {
           "0%, 100%": { transform: "scale(1)" },
-          "50%": { transform: "scale(1.2)" },
+          "50%": { transform: "scale(1.1)" },
         },
         scaleIn: {
           "0%": { transform: "scale(0)" },

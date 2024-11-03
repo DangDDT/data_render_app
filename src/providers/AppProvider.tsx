@@ -10,13 +10,7 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
   }, [children]);
 
   return (
-    <MultiProvider
-      providers={
-        [
-          // <SampleContext.Provider value={}/>
-        ]
-      }
-    >
+    <MultiProvider providers={[<SampleContext.Provider value={{}} />]}>
       {children}
     </MultiProvider>
   );
