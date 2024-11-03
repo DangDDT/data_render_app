@@ -42,7 +42,7 @@ const MovingLines = React.memo(({ users, lineSize }: MovingLinesProps) => {
         const type2 = index % 15;
         const fontSize = type2 * type * 0.0143172 + 10.315;
         const zIndex = index;
-        let top = type * 60 + 30;
+        let top = type * 55 + 30;
         if (top > window.innerHeight - 100) {
           top = window.innerHeight - type2 * 100;
         }
