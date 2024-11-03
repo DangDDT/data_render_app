@@ -1,6 +1,5 @@
 import { ReactNode, useEffect, useMemo } from "react";
 import MultiProvider from "./MultiProvider";
-import { SampleContext } from "@contexts";
 
 const AppProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {}, []);
