@@ -146,7 +146,7 @@ const GuestTable: React.FC<GuestTable> = ({
 
   const addGuest = () => {
     const guestObj: UserModel = {
-      id: users.length + 1 + "",
+      id: Number(users[0]?.id) + 1 + "",
       name: guest,
     };
     addGuestToRoom(guestObj);
