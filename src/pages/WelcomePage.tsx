@@ -12,6 +12,12 @@ import { RoomModel, UserModel } from "@models";
 import classNames from "classnames";
 import React from "react";
 import { CircularProgressLoading } from "@components/common";
+import {
+  WebBackground1,
+  WebBackground2,
+  WebBackground3,
+  WebBackground4,
+} from "@assets";
 
 type MovingLinesProps = {
   users: UserModel[];
@@ -43,14 +49,15 @@ const MovingLines = React.memo(({ users, lineSize }: MovingLinesProps) => {
         const type2 = index % 16;
         const fontSize = type2 * type * 0.0143172 + 10.315;
         const zIndex = index;
-        let top = type * 55 + 20 + type2 * 10;
-        let direction = type2 % 4 === 0 ? 1 : -1;
-        if (top > window.innerHeight - 60) {
-          top = window.innerHeight - type2 * 120.18721;
+        let top = type * 40 + 20 + type * 20 + type2 * 5;
+        let direction = type2 % 2 === 0 ? 1 : -1;
+        if (top > window.innerHeight) {
+          top = window.innerHeight - type2 * 40;
           direction = direction * -1;
         }
+        console.log("top", top);
         if (top < 30) {
-          top = type2 * 10 + 20 + type2 * 20;
+          top = type * 30 + 30 + type * 30;
           direction = direction * -1;
         }
         let speed;
@@ -107,8 +114,7 @@ const MovingLines = React.memo(({ users, lineSize }: MovingLinesProps) => {
             speed = 2.171261;
             break;
         }
-        speed =
-          speed * type2 * 0.017126389 + 0.021518 + (16 - type2) * 0.03;
+        speed = speed * type2 * 0.017126389 + 0.021518 + (16 - type2) * 0.03;
         return (
           <UserLine
             key={index}
@@ -265,9 +271,7 @@ const LineWithCircleRight = React.memo(() => {
 const UserItem = React.memo(({ user }: { user: UserModel }) => {
   return (
     <div className="inline-block rounded-md border-2 border-[#4ffc92] px-2 py-2 text-white">
-      <div className="bg-[#00672B] p-2 text-white">
-        {user && user.name}
-      </div>
+      <div className="bg-[#00672B] p-2 text-white">{user && user.name}</div>
     </div>
   );
 });
@@ -333,6 +337,7 @@ const WelcomePage = () => {
   const [rooms, setRooms] = useState<RoomModel[]>([]);
   const [displayRoom, setDisplayRoom] = useState<RoomModel | null>(null); // State chỉ để hiển thị tên phòng
   const selectedRoomRef = useRef<RoomModel | null>(null); // Ref để lưu selectedRoom thực tế
+  const [background, setBackground] = useState(WebBackground1);
   const { Modal: RoomModal, showModal: showRoomModel } = useModal();
   const [loading, setLoading] = useState(true);
 
@@ -403,15 +408,23 @@ const WelcomePage = () => {
   };
 
   return (
-    <section className="relative flex h-screen w-full items-center bg-gray-700">
-      {/*<div className="absolute inset-0 z-0 h-screen w-full">*/}
-      {/*  <img*/}
-      {/*    src={WebBackground}*/}
-      {/*    alt="background"*/}
-      {/*    className="bg-opacity-950 h-screen w-full object-cover bg-blend-darken"*/}
-      {/*    style={{ filter: "blur(2px) brightness(0.5)" }}*/}
-      {/*  />*/}
-      {/*</div>*/}
+    <section className="relative flex h-screen w-full items-center">
+      <div className="absolute inset-0 z-0 h-screen w-full">
+        {/*<img*/}
+        {/*  src={WebBackground1}*/}
+        {/*  alt="background"*/}
+        {/*  className="bg-opacity-950 h-screen w-full object-cover bg-blend-darken"*/}
+        {/*  style={{ filter: "blur(2px) brightness(0.5)" }}*/}
+        {/*/>*/}
+        <video
+          className="bg-opacity-950 h-screen w-full object-cover bg-blend-darken"
+          autoPlay
+          loop
+          muted
+          src={background}
+          typeof={"video/mp4"}
+        />
+      </div>
       <div className="flex w-full flex-col items-center">
         {loading ? (
           <CircularProgressLoading />
@@ -428,21 +441,41 @@ const WelcomePage = () => {
         </button>
       </div>
       <RoomModal>
-        <div className="grid grid-cols-5 gap-4">
-          {rooms.map((room, index) => (
-            <button
-              key={index}
-              className={classNames(
-                "rounded p-2 font-bold text-white",
-                selectedRoomRef.current?.id === room.id
-                  ? "bg-blue-500"
-                  : "bg-gray-500 hover:bg-gray-700",
-              )}
-              onClick={() => handleRoomSelection(room)}
-            >
-              {room.name}
-            </button>
-          ))}
+        <div className="flex flex-col gap-6">
+          <div className="text-center text-2xl font-bold text-teal-700">Chọn phòng</div>
+          <div className="grid grid-cols-5 gap-4">
+            {rooms.map((room, index) => (
+              <button
+                key={index}
+                className={classNames(
+                  "rounded p-2 font-bold text-white",
+                  selectedRoomRef.current?.id === room.id
+                    ? "bg-blue-500"
+                    : "bg-gray-500 hover:bg-gray-700",
+                )}
+                onClick={() => handleRoomSelection(room)}
+              >
+                {room.name}
+              </button>
+            ))}
+          </div>
+          <div className="text-center text-2xl font-bold text-teal-700">Chọn màu nền</div>
+          <div className="grid grid-cols-4 gap-4">
+            {[WebBackground1, WebBackground2, WebBackground3, WebBackground4].map(
+              (bg, index) => (
+                <button
+                  key={index}
+                  className={classNames(
+                    "rounded p-2 font-bold text-white",
+                    background === bg ? "bg-blue-500" : "bg-gray-500 hover:bg-gray-700",
+                  )}
+                  onClick={() => setBackground(bg)}
+                >
+                  {index + 1}
+                </button>
+              ),
+            )}
+          </div>
         </div>
       </RoomModal>
     </section>
