@@ -41,9 +41,9 @@ const MovingLines = React.memo(({ users, lineSize }: MovingLinesProps) => {
       {userLines.map((users, index) => {
         const type = index;
         const type2 = index % 16;
-        const fontSize = type2 * type * 0.0143172 + 12.315;
+        const fontSize = type2 * type * 0.0143172 + 10.315;
         const zIndex = index;
-        let top = type * 55 + 30 + type2 * 10;
+        let top = type * 55 + 20 + type2 * 10;
         let direction = type2 % 4 === 0 ? 1 : -1;
         if (top > window.innerHeight - 60) {
           top = window.innerHeight - type2 * 120.18721;
@@ -246,7 +246,7 @@ const LineWithCircleLeftDown = React.memo(() => {
     <div className="flex">
       <div className="absolute bottom-[0px] left-[-30px] h-4 w-4 rounded-full border-4 border-[#4ffc92]"></div>
       <div className="flex">
-        <div className="absolute left-[-20px] top-[35px] mb-0 mt-0 h-0.5 w-6 -rotate-45 transform rounded-md bg-[#4ffc92]"></div>
+        <div className="absolute left-[-20px] top-[34px] mb-0 mt-0 h-0.5 w-6 -rotate-45 transform rounded-md bg-[#4ffc92]"></div>
         <div className="mb-2 mt-2 h-0.5 w-16 rounded-md bg-[#4ffc92]"></div>
       </div>
     </div>
