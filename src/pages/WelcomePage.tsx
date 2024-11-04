@@ -98,12 +98,15 @@ const RowGuest: React.FC<{
 }> = ({ user, editGuest, deleteGuest }) => {
   const [name, setName] = useState<string>("");
 
+  useEffect(() => {
+    setName(user.name);
+  }, [user]);
+
   const handleEditGuest = () => {
     if (name === "") {
       return;
     } else {
-      editGuest({ id: user.id, name });
-      setName("");
+      editGuest({ id: user.id, name: name });
     }
   };
 
@@ -111,8 +114,8 @@ const RowGuest: React.FC<{
     <div className="flex">
       <input
         className="w-full px-2 text-black focus:outline-0"
-        value={name || user.name}
-        onChange={(e) => setName(e.target.value)}
+        value={name === "" ? "" : name}
+        onChange={(e) => setName(e?.target?.value)}
       />
       <button
         disabled={name === "" ? true : false}
@@ -145,12 +148,15 @@ const GuestTable: React.FC<GuestTable> = ({
   };
 
   const addGuest = () => {
-    const guestObj: UserModel = {
-      id: Number(users[0]?.id) + 1 + "",
-      name: guest,
-    };
-    addGuestToRoom(guestObj);
-    setGuest("");
+    if (guest != "") {
+      const userID = users?.length > 0 ? users[0]?.id : 0;
+      const guestObj: UserModel = {
+        id: Number(userID) + 1 + "",
+        name: guest,
+      };
+      addGuestToRoom(guestObj);
+      setGuest("");
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -377,6 +383,15 @@ const WelcomePage: React.FC = () => {
           >
             {pickedRoom === null ? "Chọn phòng" : pickedRoom.name}
           </button>
+        </div>
+        <div>
+          <h1 className="mt-5 text-center text-2xl text-white">
+            Tổng số:
+            <span className="mt-5 text-center text-2xl text-blue-500">
+              {" "}
+              {users.length}
+            </span>
+          </h1>
         </div>
         {pickedRoom === null ? null : (
           <GuestTable
