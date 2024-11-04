@@ -20,24 +20,26 @@ type MovingLinesProps = {
 };
 
 const MovingLines = React.memo(({ users, lineSize }: MovingLinesProps) => {
-  const numOfLines = useMemo(
-    () => Math.ceil(users.length / lineSize),
-    [users, lineSize],
-  );
-  const userlines = useMemo(() => {
-    const userlines: UserModel[][] = [];
+  const numOfLines = useMemo(() => {
+    const numOfLines = Math.ceil(users.length / lineSize);
+    console.log("numOfLines", numOfLines);
+    return numOfLines;
+  }, [users, lineSize]);
+  const userLines = useMemo(() => {
+    const userLines: UserModel[][] = [];
+    if (numOfLines === 0) return userLines;
     for (let i = 0; i < numOfLines; i++) {
       for (let j = i * lineSize; j < i * lineSize + lineSize; j++) {
-        userlines[i] = [...(userlines[i] || []), users[j]];
+        userLines[i] = [...(userLines[i] || []), users[j]];
       }
     }
-    return userlines;
-  }, [users, lineSize]);
+    console.log("userLines", userLines);
+    return userLines;
+  }, [numOfLines, users, lineSize]);
 
   return (
     <>
-      {userlines.map((users, index) => {
-        console.log(users);
+      {userLines.map((users, index) => {
         const type = index;
         const type2 = index % 16;
         const fontSize = type2 * type * 0.0143172 + 10.315;
@@ -49,7 +51,7 @@ const MovingLines = React.memo(({ users, lineSize }: MovingLinesProps) => {
           direction = direction * -1;
         }
 
-        let speed = 1.2;
+        let speed;
         switch (type2) {
           case 0:
             speed = 2.4376457;
@@ -103,7 +105,8 @@ const MovingLines = React.memo(({ users, lineSize }: MovingLinesProps) => {
             speed = 2.171261;
             break;
         }
-        speed = speed * 2 * type2 * 0.017126389 + 0.021518 + (16 - type2) * 0.03;
+        speed =
+          speed * 2 * type2 * 0.017126389 + 0.021518 + (16 - type2) * 0.03;
         return (
           <UserLine
             key={index}
@@ -185,12 +188,14 @@ const UserLine = React.memo(
               <>
                 {i === 0 && (
                   <div className="flex">
-                    {
-                      user.name.length % 3 === 0 ? <LineWithCircleLeftUp /> : <LineWithCircleLeftDown />
-                    }
+                    {user.name.length % 3 === 0 ? (
+                      <LineWithCircleLeftUp />
+                    ) : (
+                      <LineWithCircleLeftDown />
+                    )}
                   </div>
                 )}
-                {user && <UserItem key={i} user={user} />}
+                {user && <UserItem key={user.id} user={user} />}
                 {i !== users.length - 1 && (
                   <div className="flex flex-col">
                     {numberLine === 0 ? (
@@ -204,9 +209,11 @@ const UserLine = React.memo(
                     )}
                   </div>
                 )}
-                {i === usersLength-1 && <div className="flex">
-                  <LineWithCircleRight />
-                </div>}
+                {i === usersLength - 1 && (
+                  <div className="flex">
+                    <LineWithCircleRight />
+                  </div>
+                )}
               </>
             );
           })}
@@ -223,9 +230,9 @@ const Line = React.memo(() => {
 const LineWithCircleLeftUp = React.memo(() => {
   return (
     <div className="flex">
-      <div className="absolute h-4 w-4 rounded-full border-4 left-[-30px] top-[-2px] border-[#4ffc92]"></div>
+      <div className="absolute left-[-30px] top-[-2px] h-4 w-4 rounded-full border-4 border-[#4ffc92]"></div>
       <div className="flex">
-        <div className="absolute mb-0 mt-0 h-0.5 w-6 rotate-45 transform bg-[#4ffc92] left-[-19px]"></div>
+        <div className="absolute left-[-19px] mb-0 mt-0 h-0.5 w-6 rotate-45 transform bg-[#4ffc92]"></div>
         <div className="mb-2 mt-2 h-0.5 w-16 bg-[#4ffc92]"></div>
       </div>
     </div>
@@ -235,9 +242,9 @@ const LineWithCircleLeftUp = React.memo(() => {
 const LineWithCircleLeftDown = React.memo(() => {
   return (
     <div className="flex">
-      <div className="absolute h-4 w-4 rounded-full border-4 left-[-30px] bottom-[-2px] border-[#4ffc92]"></div>
+      <div className="absolute bottom-[-2px] left-[-30px] h-4 w-4 rounded-full border-4 border-[#4ffc92]"></div>
       <div className="flex">
-        <div className="absolute mb-0 mt-0 h-0.5 w-6 -rotate-45 transform bg-[#4ffc92] left-[-20px] top-[34px]"></div>
+        <div className="absolute left-[-20px] top-[34px] mb-0 mt-0 h-0.5 w-6 -rotate-45 transform bg-[#4ffc92]"></div>
         <div className="mb-2 mt-2 h-0.5 w-16 bg-[#4ffc92]"></div>
       </div>
     </div>
@@ -264,15 +271,14 @@ const UserItem = React.memo(({ user }: { user: UserModel }) => {
 });
 
 type UserRoomProps = {
-  roomId: string | null;
+  roomId?: string | null;
 };
 
-const UserRoom = ({ roomId }: UserRoomProps) => {
+const UserRoom = React.memo(({ roomId }: UserRoomProps) => {
   const usersRef = useRef<UserModel[]>([]);
   const [_, forceUpdate] = useState({});
 
   useEffect(() => {
-    if (!roomId) return;
     usersRef.current = [];
     const userRef = ref(db, `/rooms/${roomId}/users`);
     const handleChildAdded = onChildAdded(userRef, (snapshot) => {
@@ -305,21 +311,21 @@ const UserRoom = ({ roomId }: UserRoomProps) => {
       forceUpdate({}); // Trigger re-render nếu cần
     });
 
+    console.log("usersRef.current", usersRef.current);
     return () => {
       handleChildAdded();
       handleChildChanged();
       handleChildRemoved();
+      forceUpdate({}); // Trigger re-render nếu cần
     };
   }, [roomId]);
 
   return (
     <>
-      {usersRef.current && (
-        <MovingLines users={usersRef.current} lineSize={6} />
-      )}
+      <MovingLines users={usersRef.current} lineSize={6} />
     </>
   );
-};
+});
 
 const WelcomePage = () => {
   const [rooms, setRooms] = useState<RoomModel[]>([]);
@@ -405,13 +411,10 @@ const WelcomePage = () => {
         />
       </div>
       <div className="flex w-full flex-col items-center">
-        {/* Chỉ render UserRoom với roomId từ selectedRoomRef, tránh re-render khi rooms thay đổi */}
         {loading ? (
           <CircularProgressLoading />
         ) : (
-          selectedRoomRef.current && (
-            <UserRoom roomId={selectedRoomRef.current?.id} />
-          )
+          <UserRoom roomId={selectedRoomRef.current?.id} />
         )}
       </div>
       <div className="absolute bottom-0 right-0 z-[1000] p-4 text-center">
@@ -424,9 +427,9 @@ const WelcomePage = () => {
       </div>
       <RoomModal>
         <div className="grid grid-cols-5 gap-4">
-          {rooms.map((room) => (
+          {rooms.map((room, index) => (
             <button
-              key={room.id}
+              key={index}
               className={classNames(
                 "rounded p-2 font-bold text-white",
                 selectedRoomRef.current?.id === room.id
