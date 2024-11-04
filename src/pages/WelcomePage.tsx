@@ -12,7 +12,6 @@ import { RoomModel, UserModel } from "@models";
 import classNames from "classnames";
 import React from "react";
 import { CircularProgressLoading } from "@components/common";
-import { WebBackground } from "@assets";
 
 type MovingLinesProps = {
   users: UserModel[];
@@ -42,15 +41,18 @@ const MovingLines = React.memo(({ users, lineSize }: MovingLinesProps) => {
       {userLines.map((users, index) => {
         const type = index;
         const type2 = index % 16;
-        const fontSize = type2 * type * 0.0143172 + 10.315;
+        const fontSize = type2 * type * 0.0143172 + 12.315;
         const zIndex = index;
-        let top = type * 55 + 30;
+        let top = type * 55 + 30 + type2 * 10;
         let direction = type2 % 4 === 0 ? 1 : -1;
-        if (top > window.innerHeight - 100) {
-          top = window.innerHeight - type2 * 110.18721;
+        if (top > window.innerHeight - 60) {
+          top = window.innerHeight - type2 * 120.18721;
           direction = direction * -1;
         }
-
+        if (top < 30) {
+          top = type2 * 10 + 20 + type2 * 20;
+          direction = direction * -1;
+        }
         let speed;
         switch (type2) {
           case 0:
@@ -106,7 +108,7 @@ const MovingLines = React.memo(({ users, lineSize }: MovingLinesProps) => {
             break;
         }
         speed =
-          speed * 2 * type2 * 0.017126389 + 0.021518 + (16 - type2) * 0.03;
+          speed * type2 * 0.017126389 + 0.021518 + (16 - type2) * 0.03;
         return (
           <UserLine
             key={index}
@@ -144,7 +146,7 @@ const UserLine = React.memo(
     useEffect(() => {
       const line = lineRef.current;
       if (!line) return;
-      let positionX = direction > 0 ? -100 : window.innerWidth;
+      let positionX = direction > 0 ? -400 : window.innerWidth;
 
       const animateLine = () => {
         positionX += direction * speed * 2;
@@ -232,8 +234,8 @@ const LineWithCircleLeftUp = React.memo(() => {
     <div className="flex">
       <div className="absolute left-[-30px] top-[-2px] h-4 w-4 rounded-full border-4 border-[#4ffc92]"></div>
       <div className="flex">
-        <div className="absolute left-[-19px] mb-0 mt-0 h-0.5 w-6 rotate-45 transform bg-[#4ffc92]"></div>
-        <div className="mb-2 mt-2 h-0.5 w-16 bg-[#4ffc92]"></div>
+        <div className="absolute left-[-19px] mb-0 mt-0 h-0.5 w-6 rotate-45 transform rounded-md bg-[#4ffc92]"></div>
+        <div className="mb-2 mt-2 h-0.5 w-16 rounded-md bg-[#4ffc92]"></div>
       </div>
     </div>
   );
@@ -242,10 +244,10 @@ const LineWithCircleLeftUp = React.memo(() => {
 const LineWithCircleLeftDown = React.memo(() => {
   return (
     <div className="flex">
-      <div className="absolute bottom-[-2px] left-[-30px] h-4 w-4 rounded-full border-4 border-[#4ffc92]"></div>
+      <div className="absolute bottom-[0px] left-[-30px] h-4 w-4 rounded-full border-4 border-[#4ffc92]"></div>
       <div className="flex">
-        <div className="absolute left-[-20px] top-[34px] mb-0 mt-0 h-0.5 w-6 -rotate-45 transform bg-[#4ffc92]"></div>
-        <div className="mb-2 mt-2 h-0.5 w-16 bg-[#4ffc92]"></div>
+        <div className="absolute left-[-20px] top-[35px] mb-0 mt-0 h-0.5 w-6 -rotate-45 transform rounded-md bg-[#4ffc92]"></div>
+        <div className="mb-2 mt-2 h-0.5 w-16 rounded-md bg-[#4ffc92]"></div>
       </div>
     </div>
   );
@@ -263,7 +265,7 @@ const LineWithCircleRight = React.memo(() => {
 const UserItem = React.memo(({ user }: { user: UserModel }) => {
   return (
     <div className="inline-block rounded-md border-2 border-[#4ffc92] px-2 py-2 text-white">
-      <div className="bg-[#00672B] p-2 text-yellow-300">
+      <div className="bg-[#00672B] p-2 text-white">
         {user && user.name}
       </div>
     </div>
@@ -401,15 +403,15 @@ const WelcomePage = () => {
   };
 
   return (
-    <section className="flex h-screen w-full items-center">
-      <div className="absolute inset-0 z-0 h-screen w-full">
-        <img
-          src={WebBackground}
-          alt="background"
-          className="bg-opacity-950 h-screen w-full object-cover bg-blend-darken"
-          style={{ filter: "blur(2px) brightness(0.5)" }}
-        />
-      </div>
+    <section className="relative flex h-screen w-full items-center bg-gray-700">
+      {/*<div className="absolute inset-0 z-0 h-screen w-full">*/}
+      {/*  <img*/}
+      {/*    src={WebBackground}*/}
+      {/*    alt="background"*/}
+      {/*    className="bg-opacity-950 h-screen w-full object-cover bg-blend-darken"*/}
+      {/*    style={{ filter: "blur(2px) brightness(0.5)" }}*/}
+      {/*  />*/}
+      {/*</div>*/}
       <div className="flex w-full flex-col items-center">
         {loading ? (
           <CircularProgressLoading />
