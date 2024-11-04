@@ -337,7 +337,11 @@ const WelcomePage = () => {
   const [rooms, setRooms] = useState<RoomModel[]>([]);
   const [displayRoom, setDisplayRoom] = useState<RoomModel | null>(null); // State chỉ để hiển thị tên phòng
   const selectedRoomRef = useRef<RoomModel | null>(null); // Ref để lưu selectedRoom thực tế
-  const [background, setBackground] = useState(WebBackground1);
+  const [background, setBackground] = useState(0);
+  const backgrounds = useMemo(
+    () => [WebBackground1, WebBackground2, WebBackground3, WebBackground4],
+    [],
+  )
   const { Modal: RoomModal, showModal: showRoomModel } = useModal();
   const [loading, setLoading] = useState(true);
 
@@ -421,7 +425,7 @@ const WelcomePage = () => {
           autoPlay
           loop
           muted
-          src={background}
+          src={backgrounds[background]}
           typeof={"video/mp4"}
         />
       </div>
@@ -461,15 +465,15 @@ const WelcomePage = () => {
           </div>
           <div className="text-center text-2xl font-bold text-teal-700">Chọn màu nền</div>
           <div className="grid grid-cols-4 gap-4">
-            {[WebBackground1, WebBackground2, WebBackground3, WebBackground4].map(
-              (bg, index) => (
+            {backgrounds.map(
+              (_, index) => (
                 <button
                   key={index}
                   className={classNames(
                     "rounded p-2 font-bold text-white",
-                    background === bg ? "bg-blue-500" : "bg-gray-500 hover:bg-gray-700",
+                    index === background ? "bg-blue-500" : "bg-gray-500 hover:bg-gray-700",
                   )}
-                  onClick={() => setBackground(bg)}
+                  onClick={() => setBackground(index)}
                 >
                   {index + 1}
                 </button>
