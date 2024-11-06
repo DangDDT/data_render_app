@@ -12,7 +12,6 @@ import { RoomModel, UserModel } from "@models";
 import classNames from "classnames";
 import React from "react";
 import { CircularProgressLoading } from "@components/common";
-import { WebBackground1, WebBackground2 } from "@assets";
 
 type MovingLinesProps = {
   users: UserModel[];
@@ -327,7 +326,13 @@ const WelcomePage = () => {
   const [displayRoom, setDisplayRoom] = useState<RoomModel | null>(null); // State chỉ để hiển thị tên phòng
   const selectedRoomRef = useRef<RoomModel | null>(null); // Ref để lưu selectedRoom thực tế
   const [background, setBackground] = useState(0);
-  const backgrounds = useMemo(() => [WebBackground1, WebBackground2], []);
+  const backgrounds = useMemo(
+    () => [
+      "https://udwyfg5wttk2ihht.public.blob.vercel-storage.com/web-background-1-M9UW1gz1ZsqrS4kGmcuCdoLGa4WWdQ.mov",
+      "https://udwyfg5wttk2ihht.public.blob.vercel-storage.com/web-background-2-6Y7AaS1Z8P9XE2k33swoSTBuJ5srwJ.mov",
+    ],
+    [],
+  );
   const { Modal: RoomModal, showModal: showRoomModel } = useModal();
   const [loading, setLoading] = useState(true);
 
