@@ -12,6 +12,7 @@ import { RoomModel, UserModel } from "@models";
 import classNames from "classnames";
 import React from "react";
 import { CircularProgressLoading } from "@components/common";
+import { WebBackground1, WebBackground2, WebBackground3 } from "@assets";
 
 type MovingLinesProps = {
   users: UserModel[];
@@ -41,9 +42,9 @@ const MovingLines = React.memo(({ users, lineSize }: MovingLinesProps) => {
       {userLines.map((users, index) => {
         const type = index;
         const type2 = index % 16;
-        const fontSize = type2 * type * 0.0143172 + 10.315;
+        const fontSize = type2 * type * 0.0143172 + 18.315;
         const zIndex = index;
-        let top = type * 36 + 20 + type2 * 30 + 30;
+        let top = type * 36 + 20 + type2 * 30;
         let direction = type2 % 2 === 0 ? 1 : -1;
         while (top > window.innerHeight) {
           top = top - window.innerHeight;
@@ -226,7 +227,7 @@ const Line = React.memo(() => {
 const LineWithCircleLeftUp = React.memo(() => {
   return (
     <div className="flex">
-      <div className="absolute left-[-30px] top-[-2px] h-4 w-4 rounded-full border-4 border-[#4ffc92]"></div>
+      <div className="absolute left-[-30px] top-[2px] h-4 w-4 rounded-full border-4 border-[#4ffc92]"></div>
       <div className="flex">
         <div className="absolute left-[-19px] mb-0 mt-0 h-0.5 w-6 rotate-45 transform rounded-md bg-[#4ffc92]"></div>
         <div className="mb-2 mt-2 h-0.5 w-16 rounded-md bg-[#4ffc92]"></div>
@@ -238,9 +239,9 @@ const LineWithCircleLeftUp = React.memo(() => {
 const LineWithCircleLeftDown = React.memo(() => {
   return (
     <div className="flex">
-      <div className="absolute bottom-[0px] left-[-30px] h-4 w-4 rounded-full border-4 border-[#4ffc92]"></div>
+      <div className="absolute bottom-[4px] left-[-30px] h-4 w-4 rounded-full border-4 border-[#4ffc92]"></div>
       <div className="flex">
-        <div className="absolute left-[-20px] top-[34px] mb-0 mt-0 h-0.5 w-6 -rotate-45 transform rounded-md bg-[#4ffc92]"></div>
+        <div className="absolute left-[-20px] top-[40px] mb-0 mt-0 h-0.5 w-6 -rotate-45 transform rounded-md bg-[#4ffc92]"></div>
         <div className="mb-2 mt-2 h-0.5 w-16 rounded-md bg-[#4ffc92]"></div>
       </div>
     </div>
@@ -327,10 +328,7 @@ const WelcomePage = () => {
   const selectedRoomRef = useRef<RoomModel | null>(null); // Ref để lưu selectedRoom thực tế
   const [background, setBackground] = useState(0);
   const backgrounds = useMemo(
-    () => [
-      "https://udwyfg5wttk2ihht.public.blob.vercel-storage.com/web-background-1-M9UW1gz1ZsqrS4kGmcuCdoLGa4WWdQ.mov",
-      "https://udwyfg5wttk2ihht.public.blob.vercel-storage.com/web-background-2-6Y7AaS1Z8P9XE2k33swoSTBuJ5srwJ.mov",
-    ],
+    () => [WebBackground1, WebBackground2, WebBackground3],
     [],
   );
   const { Modal: RoomModal, showModal: showRoomModel } = useModal();
@@ -405,19 +403,13 @@ const WelcomePage = () => {
   return (
     <section className="relative flex h-screen w-full items-center">
       <div className="absolute inset-0 z-0 h-screen w-full">
-        {/*<img*/}
-        {/*  src={WebBackground1}*/}
-        {/*  alt="background"*/}
-        {/*  className="bg-opacity-950 h-screen w-full object-cover bg-blend-darken"*/}
-        {/*  style={{ filter: "blur(2px) brightness(0.5)" }}*/}
-        {/*/>*/}
         <video
           className="bg-opacity-950 h-screen w-full object-cover bg-blend-darken"
           autoPlay
           loop
           muted
           src={backgrounds[background]}
-          typeof={"video/mov"}
+          typeof={"video/mp4"}
         />
       </div>
       <div className="flex w-full flex-col items-center">
