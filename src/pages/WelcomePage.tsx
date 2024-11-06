@@ -12,12 +12,7 @@ import { RoomModel, UserModel } from "@models";
 import classNames from "classnames";
 import React from "react";
 import { CircularProgressLoading } from "@components/common";
-import {
-  WebBackground1,
-  WebBackground2,
-  WebBackground3,
-  WebBackground4,
-} from "@assets";
+import { WebBackground1, WebBackground2 } from "@assets";
 
 type MovingLinesProps = {
   users: UserModel[];
@@ -49,16 +44,10 @@ const MovingLines = React.memo(({ users, lineSize }: MovingLinesProps) => {
         const type2 = index % 16;
         const fontSize = type2 * type * 0.0143172 + 10.315;
         const zIndex = index;
-        let top = type * 40 + 20 + type * 20 + type2 * 5;
+        let top = type * 36 + 20 + type2 * 30 + 30;
         let direction = type2 % 2 === 0 ? 1 : -1;
-        if (top > window.innerHeight) {
-          top = window.innerHeight - type2 * 40;
-          direction = direction * -1;
-        }
-        console.log("top", top);
-        if (top < 30) {
-          top = type * 30 + 30 + type * 30;
-          direction = direction * -1;
+        while (top > window.innerHeight) {
+          top = top - window.innerHeight;
         }
         let speed;
         switch (type2) {
@@ -338,10 +327,7 @@ const WelcomePage = () => {
   const [displayRoom, setDisplayRoom] = useState<RoomModel | null>(null); // State chỉ để hiển thị tên phòng
   const selectedRoomRef = useRef<RoomModel | null>(null); // Ref để lưu selectedRoom thực tế
   const [background, setBackground] = useState(0);
-  const backgrounds = useMemo(
-    () => [WebBackground1, WebBackground2, WebBackground3, WebBackground4],
-    [],
-  )
+  const backgrounds = useMemo(() => [WebBackground1, WebBackground2], []);
   const { Modal: RoomModal, showModal: showRoomModel } = useModal();
   const [loading, setLoading] = useState(true);
 
@@ -426,7 +412,7 @@ const WelcomePage = () => {
           loop
           muted
           src={backgrounds[background]}
-          typeof={"video/mp4"}
+          typeof={"video/mov"}
         />
       </div>
       <div className="flex w-full flex-col items-center">
@@ -446,7 +432,9 @@ const WelcomePage = () => {
       </div>
       <RoomModal>
         <div className="flex flex-col gap-6">
-          <div className="text-center text-2xl font-bold text-teal-700">Chọn phòng</div>
+          <div className="text-center text-2xl font-bold text-teal-700">
+            Chọn phòng
+          </div>
           <div className="grid grid-cols-5 gap-4">
             {rooms.map((room, index) => (
               <button
@@ -463,22 +451,24 @@ const WelcomePage = () => {
               </button>
             ))}
           </div>
-          <div className="text-center text-2xl font-bold text-teal-700">Chọn màu nền</div>
+          <div className="text-center text-2xl font-bold text-teal-700">
+            Chọn màu nền
+          </div>
           <div className="grid grid-cols-4 gap-4">
-            {backgrounds.map(
-              (_, index) => (
-                <button
-                  key={index}
-                  className={classNames(
-                    "rounded p-2 font-bold text-white",
-                    index === background ? "bg-blue-500" : "bg-gray-500 hover:bg-gray-700",
-                  )}
-                  onClick={() => setBackground(index)}
-                >
-                  {index + 1}
-                </button>
-              ),
-            )}
+            {backgrounds.map((_, index) => (
+              <button
+                key={index}
+                className={classNames(
+                  "rounded p-2 font-bold text-white",
+                  index === background
+                    ? "bg-blue-500"
+                    : "bg-gray-500 hover:bg-gray-700",
+                )}
+                onClick={() => setBackground(index)}
+              >
+                {index + 1}
+              </button>
+            ))}
           </div>
         </div>
       </RoomModal>
