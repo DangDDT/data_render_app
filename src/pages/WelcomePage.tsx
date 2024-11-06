@@ -42,7 +42,7 @@ const MovingLines = React.memo(({ users, lineSize }: MovingLinesProps) => {
       {userLines.map((users, index) => {
         const type = index;
         const type2 = index % 16;
-        const fontSize = type2 * type * 0.0143172 + 18.315;
+        const fontSize = type2 * type * 0.0143172 + 14.315;
         const zIndex = index;
         let top = type * 36 + 20 + type2 * 30;
         let direction = type2 % 2 === 0 ? 1 : -1;
