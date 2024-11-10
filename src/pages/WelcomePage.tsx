@@ -119,9 +119,9 @@ const WelcomePage = () => {
     }
     setNewUser(user);
     showWelcomeUserModal();
-    // setTimeout(() => {
-    //   hideWelcomeUserModel();
-    // }, 10000);
+    setTimeout(() => {
+      hideWelcomeUserModel();
+    }, 7000);
   }, []);
 
   const handleWhenSettingClicked = useCallback(() => {
