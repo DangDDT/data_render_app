@@ -222,7 +222,7 @@ const WelcomePage = () => {
         overrideClassName="rounded-md border-8 border-[#4ffc92] bg-transparent min-w-[40%]"
       >
         <div className="flex flex-col items-center justify-center gap-5 rounded-md bg-[#00672B] p-8">
-          <div>
+          <div onClick={hideWelcomeUserModel}>
             <Lottie options={defaultOptions} height={250} width={250} />
           </div>
           <div className="text-center text-2xl font-bold text-white">
