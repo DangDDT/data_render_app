@@ -30,7 +30,7 @@ const MovingLines = React.memo(({ users, lineSize }: MovingLinesProps) => {
         const type2 = index % 16;
         const fontSize = 14;
         const zIndex = index;
-        let top = type * 36 + 20 + type2 * 27;
+        let top = type * 36 + 20 + type2 * 25;
         let direction = type2 % 2 === 0 ? 1 : -1;
         while (top > window.innerHeight) {
           top = top - window.innerHeight;

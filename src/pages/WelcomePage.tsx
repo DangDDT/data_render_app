@@ -11,11 +11,15 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { RoomModel, UserModel } from "@models";
 import classNames from "classnames";
 import { CircularProgressLoading } from "@components/common";
-import { WebBackground1, WebBackground2, WebBackground3 } from "@assets";
+import {
+  WebBackground1,
+  WebBackground2,
+  WebBackground3,
+  WelcomeUserIcon,
+  WelcomeUserIcon2,
+} from "@assets";
 import { UserRoom } from "@components/welcome/UserRoom";
 import { SettingIcon } from "@components/icons";
-import Lottie from "react-lottie";
-import animationData from "../assets/welcome-user.json";
 
 const WelcomePage = () => {
   const [rooms, setRooms] = useState<RoomModel[]>([]);
@@ -121,7 +125,7 @@ const WelcomePage = () => {
     showWelcomeUserModal();
     setTimeout(() => {
       hideWelcomeUserModel();
-    }, 7000);
+    }, 10000);
   }, []);
 
   const handleWhenSettingClicked = useCallback(() => {
@@ -131,17 +135,6 @@ const WelcomePage = () => {
     if (!roomModalIsOpen()) {
       showRoomModal();
     }
-  }, []);
-
-  const defaultOptions = useMemo(() => {
-    return {
-      loop: true,
-      autoplay: true,
-      animationData: animationData,
-      rendererSettings: {
-        preserveAspectRatio: "xMidYMid slice",
-      },
-    };
   }, []);
 
   return (
@@ -223,16 +216,25 @@ const WelcomePage = () => {
       >
         <div className="flex w-full flex-col items-center justify-center gap-5 rounded-md bg-[#00672B] p-4">
           <div onClick={hideWelcomeUserModel}>
-            <Lottie options={defaultOptions} height={250} width={250} />
+            <img
+              className="relative my-auto ml-8 animate-scale transition-transform duration-500"
+              src={WelcomeUserIcon}
+              alt="Welcome user"
+              width="400"
+              height="400"
+            />
           </div>
-          <div className="text-center text-2xl font-bold text-white">
-            Chào mừng bạn
+          <div className="text-center text-2xl font-medium text-white">
+            Cảm ơn bạn
           </div>
-          <div className="animate-scale text-center text-5xl font-bold text-white">
+          <div
+            className="animate-scale text-center text-5xl font-medium text-white"
+            style={{ textShadow: "0 0 10px #4ffc92" }}
+          >
             {newUser?.name}
           </div>
-          <div className="text-center text-2xl font-bold text-white">
-            đã trở thành vi mạch
+          <div className="text-center text-2xl font-medium text-white">
+            đã góp <span>vi mạch</span> quý giá vào <span>bảng mạch xanh</span>.
           </div>
         </div>
       </WelcomeUserModal>
