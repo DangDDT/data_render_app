@@ -119,9 +119,9 @@ const WelcomePage = () => {
     }
     setNewUser(user);
     showWelcomeUserModal();
-    setTimeout(() => {
-      hideWelcomeUserModel();
-    }, 10000);
+    // setTimeout(() => {
+    //   hideWelcomeUserModel();
+    // }, 10000);
   }, []);
 
   const handleWhenSettingClicked = useCallback(() => {
@@ -219,16 +219,16 @@ const WelcomePage = () => {
       <WelcomeUserModal
         scaleIn={true}
         hasCloseButton={false}
-        overrideClassName="rounded-md border-8 border-[#4ffc92] bg-transparent min-w-[40%]"
+        overrideClassName="rounded-md border-8 border-[#4ffc92] bg-transparent min-w-[40%] p-2"
       >
-        <div className="flex flex-col items-center justify-center gap-5 rounded-md bg-[#00672B] p-8">
+        <div className="flex w-full flex-col items-center justify-center gap-5 rounded-md bg-[#00672B] p-4">
           <div onClick={hideWelcomeUserModel}>
             <Lottie options={defaultOptions} height={250} width={250} />
           </div>
           <div className="text-center text-2xl font-bold text-white">
             Chào mừng bạn
           </div>
-          <div className="animate-scale text-center text-4xl font-bold text-white">
+          <div className="animate-scale text-center text-5xl font-bold text-white">
             {newUser?.name}
           </div>
           <div className="text-center text-2xl font-bold text-white">

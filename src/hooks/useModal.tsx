@@ -50,7 +50,7 @@ const useModal = () => {
             )}
             {...props}
           >
-            <div className="modal-box p-12">{children}</div>
+            <div className="modal-box">{children}</div>
             {hasCloseButton && (
               <form method="dialog" className="modal-backdrop">
                 <button className="float-end rounded-md bg-gray-500 p-2 text-white">
