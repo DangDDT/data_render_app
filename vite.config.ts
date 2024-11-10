@@ -30,6 +30,7 @@ export default defineConfig(async ({ mode }) => {
         "@pages": resolve(__dirname, "src/pages/index.ts"),
         "@providers": resolve(__dirname, "src/providers/index.ts"),
         "@services": resolve(__dirname, "src/services/index.ts"),
+        "@icons": resolve(__dirname, "src/components/icons/index.tsx"),
       },
     },
     build: {

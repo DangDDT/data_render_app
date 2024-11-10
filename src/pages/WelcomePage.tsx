@@ -7,332 +7,42 @@ import {
   onChildRemoved,
   ref,
 } from "firebase/database";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { RoomModel, UserModel } from "@models";
 import classNames from "classnames";
-import React from "react";
 import { CircularProgressLoading } from "@components/common";
 import { WebBackground1, WebBackground2, WebBackground3 } from "@assets";
-
-type MovingLinesProps = {
-  users: UserModel[];
-  lineSize: number;
-};
-
-const MovingLines = React.memo(({ users, lineSize }: MovingLinesProps) => {
-  const numOfLines = useMemo(() => {
-    const numOfLines = Math.ceil(users.length / lineSize);
-    console.log("numOfLines", numOfLines);
-    return numOfLines;
-  }, [users, lineSize]);
-  const userLines = useMemo(() => {
-    const userLines: UserModel[][] = [];
-    if (numOfLines === 0) return userLines;
-    for (let i = 0; i < numOfLines; i++) {
-      for (let j = i * lineSize; j < i * lineSize + lineSize; j++) {
-        userLines[i] = [...(userLines[i] || []), users[j]];
-      }
-    }
-    console.log("userLines", userLines);
-    return userLines;
-  }, [numOfLines, users, lineSize]);
-
-  return (
-    <>
-      {userLines.map((users, index) => {
-        const type = index;
-        const type2 = index % 16;
-        const fontSize = 14;
-        const zIndex = index;
-        let top = type * 36 + 20 + type2 * 27;
-        let direction = type2 % 2 === 0 ? 1 : -1;
-        while (top > window.innerHeight) {
-          top = top - window.innerHeight;
-        }
-        let speed;
-        switch (type2) {
-          case 0:
-            speed = 2.4376457;
-            break;
-          case 1:
-            speed = 2.4351;
-            break;
-          case 2:
-            speed = 2.6126435;
-            break;
-          case 3:
-            speed = 2.823112;
-            break;
-          case 4:
-            speed = 2.742323;
-            break;
-          case 5:
-            speed = 2.275345;
-            break;
-          case 6:
-            speed = 2.9172;
-            break;
-          case 7:
-            speed = 2.412435;
-            break;
-          case 8:
-            speed = 2.86341;
-            break;
-          case 9:
-            speed = 2.95325;
-            break;
-          case 10:
-            speed = 2.9421;
-            break;
-          case 11:
-            speed = 2.14543;
-            break;
-          case 12:
-            speed = 2.7156;
-            break;
-          case 13:
-            speed = 2.98436;
-            break;
-          case 14:
-            speed = 2.8826;
-            break;
-          case 15:
-            speed = 2.471261;
-            break;
-          default:
-            speed = 2.171261;
-            break;
-        }
-        speed = speed * type2 * 0.017126389 + 0.021518 + (16 - type2) * 0.03;
-        return (
-          <UserLine
-            key={index}
-            direction={direction}
-            speed={speed}
-            users={users}
-            fontSize={fontSize}
-            zIndex={zIndex}
-            top={top}
-          />
-        );
-      })}
-    </>
-  );
-});
-
-const UserLine = React.memo(
-  ({
-    direction,
-    speed,
-    users,
-    fontSize,
-    zIndex,
-    top,
-  }: {
-    direction: number;
-    speed: number;
-    users: UserModel[];
-    fontSize: number;
-    zIndex: number;
-    top: number;
-  }) => {
-    const lineRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-      const line = lineRef.current;
-      if (!line) return;
-      let positionX = direction > 0 ? -400 : window.innerWidth;
-
-      const animateLine = () => {
-        positionX += direction * speed * 2;
-
-        if (direction > 0 && positionX >= window.innerWidth) {
-          positionX = -line.offsetWidth;
-        } else if (direction < 0 && positionX <= -line.offsetWidth) {
-          positionX = window.innerWidth;
-        }
-
-        line.style.transform = `translateX(${positionX}px)`;
-        requestAnimationFrame(animateLine);
-      };
-
-      animateLine();
-    }, [direction, speed]);
-
-    return (
-      <div
-        className="absolute w-full"
-        style={{
-          top: top,
-          zIndex: zIndex,
-          fontSize: `${fontSize}px`,
-        }}
-      >
-        <div className="flex items-center" ref={lineRef}>
-          {users.map((user, i) => {
-            if (!user || !user.name) return null;
-            let numberLine = (user?.name.length ?? 0) % 3;
-            if (!users[i + 1] || !users[i + 1].name) {
-              numberLine = -1;
-            }
-            let usersLength = 0;
-            for (let j = 0; j < users.length; j++) {
-              if (users[j] && users[j].name) {
-                usersLength++;
-              }
-            }
-            return (
-              <>
-                {i === 0 && (
-                  <div className="flex">
-                    {user.name.length % 3 === 0 ? (
-                      <LineWithCircleLeftUp />
-                    ) : (
-                      <LineWithCircleLeftDown />
-                    )}
-                  </div>
-                )}
-                {user && <UserItem key={user.id} user={user} />}
-                {i !== users.length - 1 && (
-                  <div className="flex flex-col">
-                    {numberLine === 0 ? (
-                      <Line key={i} />
-                    ) : numberLine === -1 ? (
-                      <></>
-                    ) : (
-                      Array.from({ length: numberLine }).map((_, index) => (
-                        <Line key={index} />
-                      ))
-                    )}
-                  </div>
-                )}
-                {i === usersLength - 1 && (
-                  <div className="flex">
-                    <LineWithCircleRight />
-                  </div>
-                )}
-              </>
-            );
-          })}
-        </div>
-      </div>
-    );
-  },
-);
-
-const Line = React.memo(() => {
-  return <div className="mb-2 mt-2 h-0.5 w-16 bg-[#4ffc92]"></div>;
-});
-
-const LineWithCircleLeftUp = React.memo(() => {
-  return (
-    <div className="flex">
-      <div className="absolute left-[-30px] top-[0px] h-4 w-4 rounded-full border-4 border-[#4ffc92]"></div>
-      <div className="flex">
-        <div className="absolute left-[-19px] mb-0 mt-0 h-0.5 w-6 rotate-45 transform rounded-md bg-[#4ffc92]"></div>
-        <div className="mb-2 mt-2 h-0.5 w-16 rounded-md bg-[#4ffc92]"></div>
-      </div>
-    </div>
-  );
-});
-
-const LineWithCircleLeftDown = React.memo(() => {
-  return (
-    <div className="flex">
-      <div className="absolute bottom-[-2px] left-[-30px] h-4 w-4 rounded-full border-4 border-[#4ffc92]"></div>
-      <div className="flex">
-        <div className="absolute left-[-20px] top-[36px] mb-0 mt-0 h-0.5 w-6 -rotate-45 transform rounded-md bg-[#4ffc92]"></div>
-        <div className="mb-2 mt-2 h-0.5 w-16 rounded-md bg-[#4ffc92]"></div>
-      </div>
-    </div>
-  );
-});
-
-const LineWithCircleRight = React.memo(() => {
-  return (
-    <div className="flex">
-      <div className="mb-2 mt-2 h-0.5 w-16 bg-[#4ffc92]"></div>
-      <div className="right-[30px] top-[2px] h-4 w-4 rounded-full border-4 border-[#4ffc92]"></div>
-    </div>
-  );
-});
-
-const UserItem = React.memo(({ user }: { user: UserModel }) => {
-  return (
-    <div className="inline-block rounded-md border-2 border-[#4ffc92] px-2 py-2 text-white">
-      <div className="bg-[#00672B] p-2 text-white">{user && user.name}</div>
-    </div>
-  );
-});
-
-type UserRoomProps = {
-  roomId?: string | null;
-};
-
-const UserRoom = React.memo(({ roomId }: UserRoomProps) => {
-  const usersRef = useRef<UserModel[]>([]);
-  const [_, forceUpdate] = useState({});
-
-  useEffect(() => {
-    usersRef.current = [];
-    const userRef = ref(db, `/rooms/${roomId}/users`);
-    const handleChildAdded = onChildAdded(userRef, (snapshot) => {
-      const newUser = snapshot.val();
-      if (newUser) {
-        usersRef.current = [
-          ...usersRef.current,
-          { id: snapshot.key, name: newUser.name },
-        ];
-        forceUpdate({}); // Trigger re-render nếu cần
-      }
-    });
-
-    // Listener for users updated
-    const handleChildChanged = onChildChanged(userRef, (snapshot) => {
-      const updatedUser = snapshot.val();
-      if (updatedUser) {
-        usersRef.current = usersRef.current.map((user) =>
-          user.id === snapshot.key ? { ...user, name: updatedUser.name } : user,
-        );
-        forceUpdate({}); // Trigger re-render nếu cần
-      }
-    });
-
-    // Listener for users removed
-    const handleChildRemoved = onChildRemoved(userRef, (snapshot) => {
-      usersRef.current = usersRef.current.filter(
-        (user) => user.id !== snapshot.key,
-      );
-      forceUpdate({}); // Trigger re-render nếu cần
-    });
-
-    console.log("usersRef.current", usersRef.current);
-    return () => {
-      handleChildAdded();
-      handleChildChanged();
-      handleChildRemoved();
-      forceUpdate({}); // Trigger re-render nếu cần
-    };
-  }, [roomId]);
-
-  return (
-    <>
-      <MovingLines users={usersRef.current} lineSize={6} />
-    </>
-  );
-});
+import { UserRoom } from "@components/welcome/UserRoom";
+import { SettingIcon } from "@components/icons";
+import Lottie from "react-lottie";
+import animationData from "../assets/welcome-user.json";
 
 const WelcomePage = () => {
   const [rooms, setRooms] = useState<RoomModel[]>([]);
-  const [displayRoom, setDisplayRoom] = useState<RoomModel | null>(null); // State chỉ để hiển thị tên phòng
-  const selectedRoomRef = useRef<RoomModel | null>(null); // Ref để lưu selectedRoom thực tế
+  const [_, setDisplayRoom] = useState<RoomModel | null>(null);
+  const selectedRoomRef = useRef<RoomModel | null>(null);
   const [background, setBackground] = useState(0);
   const backgrounds = useMemo(
     () => [WebBackground1, WebBackground2, WebBackground3],
     [],
   );
-  const { Modal: RoomModal, showModal: showRoomModel } = useModal();
+  const {
+    Modal: RoomModal,
+    showModal: showRoomModal,
+    hideModal: hideRoomModal,
+    isOpen: roomModalIsOpen,
+  } = useModal();
   const [loading, setLoading] = useState(true);
+
+  /// For show modal when user enroll the room.
+  const {
+    Modal: WelcomeUserModal,
+    showModal: showWelcomeUserModal,
+    hideModal: hideWelcomeUserModel,
+    isOpen: welcomeUserModalIsOpen,
+  } = useModal();
+
+  const [newUser, setNewUser] = useState<UserModel | null>(null);
 
   useEffect(() => {
     const dataRef = ref(db, "/rooms");
@@ -400,6 +110,40 @@ const WelcomePage = () => {
     setLoading(false);
   };
 
+  const handleWhenNewUserEnroll = useCallback((user: UserModel) => {
+    if (roomModalIsOpen()) {
+      hideRoomModal();
+    }
+    if (welcomeUserModalIsOpen()) {
+      hideWelcomeUserModel();
+    }
+    setNewUser(user);
+    showWelcomeUserModal();
+    setTimeout(() => {
+      hideWelcomeUserModel();
+    }, 10000);
+  }, []);
+
+  const handleWhenSettingClicked = useCallback(() => {
+    if (welcomeUserModalIsOpen()) {
+      hideWelcomeUserModel();
+    }
+    if (!roomModalIsOpen()) {
+      showRoomModal();
+    }
+  }, []);
+
+  const defaultOptions = useMemo(() => {
+    return {
+      loop: true,
+      autoplay: true,
+      animationData: animationData,
+      rendererSettings: {
+        preserveAspectRatio: "xMidYMid slice",
+      },
+    };
+  }, []);
+
   return (
     <section className="relative flex h-screen w-full items-center">
       <div className="absolute inset-0 z-0 h-screen w-full">
@@ -416,37 +160,18 @@ const WelcomePage = () => {
         {loading ? (
           <CircularProgressLoading />
         ) : (
-          <UserRoom roomId={selectedRoomRef.current?.id} />
+          <UserRoom
+            roomId={selectedRoomRef.current?.id}
+            onUserAdded={handleWhenNewUserEnroll}
+          />
         )}
       </div>
       <div className="absolute bottom-0 right-0 z-[1000] p-4 text-center">
         <button
-          onClick={showRoomModel}
+          onClick={handleWhenSettingClicked}
           className="rounded bg-blue-500 px-4 py-2 font-bold text-white opacity-10 hover:bg-blue-700"
         >
-          {loading ? (
-            <CircularProgressLoading />
-          ) : (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="size-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-              />
-            </svg>
-          )}
+          {loading ? <CircularProgressLoading /> : <SettingIcon />}
         </button>
       </div>
       <RoomModal>
@@ -491,6 +216,26 @@ const WelcomePage = () => {
           </div>
         </div>
       </RoomModal>
+      <WelcomeUserModal
+        scaleIn={true}
+        hasCloseButton={false}
+        overrideClassName="rounded-md border-8 border-[#4ffc92] bg-transparent min-w-[40%]"
+      >
+        <div className="flex flex-col items-center justify-center gap-5 rounded-md bg-[#00672B] p-8">
+          <div>
+            <Lottie options={defaultOptions} height={250} width={250} />
+          </div>
+          <div className="text-center text-2xl font-bold text-white">
+            Chào mừng bạn
+          </div>
+          <div className="animate-scale text-center text-4xl font-bold text-white">
+            {newUser?.name}
+          </div>
+          <div className="text-center text-2xl font-bold text-white">
+            đã trở thành vi mạch
+          </div>
+        </div>
+      </WelcomeUserModal>
     </section>
   );
 };

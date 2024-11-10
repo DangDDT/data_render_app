@@ -1,13 +1,29 @@
+import classNames from "classnames";
 import { memo, useCallback, useMemo, useRef } from "react";
 
 const useModal = () => {
-  const modelRef = useRef<HTMLDialogElement | null>(null);
+  const modalRef = useRef<HTMLDialogElement | null>(null);
 
   const showModal = useCallback(() => {
-    const model = modelRef.current;
-    if (model) {
-      model.showModal();
+    const modal = modalRef.current;
+    if (modal) {
+      modal.showModal();
     }
+  }, []);
+
+  const hideModal = useCallback(() => {
+    const modal = modalRef.current;
+    if (modal) {
+      modal.close();
+    }
+  }, []);
+
+  const isOpen = useCallback(() => {
+    const modal = modalRef.current;
+    if (modal) {
+      return modal.open;
+    }
+    return false;
   }, []);
 
   const Modal = useMemo(
@@ -15,17 +31,33 @@ const useModal = () => {
       memo(
         ({
           children,
+          scaleIn = false,
+          hasCloseButton = true,
+          overrideClassName,
           ...props
         }: {
+          scaleIn?: boolean;
+          hasCloseButton?: boolean;
+          overrideClassName?: string;
           children: React.ReactNode;
         } & React.ComponentProps<"dialog">) => (
-          <dialog ref={modelRef} className="modal rounded-md p-4" {...props}>
+          <dialog
+            ref={modalRef}
+            className={classNames(
+              "modal",
+              overrideClassName ?? "rounded-md p-4",
+              scaleIn ? "animate-scaleIn" : null,
+            )}
+            {...props}
+          >
             <div className="modal-box p-12">{children}</div>
-            <form method="dialog" className="modal-backdrop">
-              <button className="float-end rounded-md bg-gray-500 p-2 text-white">
-                Đóng
-              </button>
-            </form>
+            {hasCloseButton && (
+              <form method="dialog" className="modal-backdrop">
+                <button className="float-end rounded-md bg-gray-500 p-2 text-white">
+                  Đóng
+                </button>
+              </form>
+            )}
           </dialog>
         ),
       ),
@@ -35,8 +67,10 @@ const useModal = () => {
   const api = useMemo(
     () => ({
       showModal,
+      hideModal,
+      isOpen,
     }),
-    [showModal],
+    [showModal, hideModal, isOpen],
   );
 
   return { ...api, Modal };

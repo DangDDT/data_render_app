@@ -13,7 +13,8 @@
       "@models": ["./src/models/index.ts"],
       "@pages": ["./src/pages/index.ts"],
       "@providers": ["./src/providers/index.ts"],
-      "@services": ["./src/services/index.ts"]
+      "@services": ["./src/services/index.ts"],
+      "@icons": ["./src/components/icons/index.ts"]
     }
   }
 }
