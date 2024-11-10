@@ -16,7 +16,6 @@ import {
   WebBackground2,
   WebBackground3,
   WelcomeUserIcon,
-  WelcomeUserIcon2,
 } from "@assets";
 import { UserRoom } from "@components/welcome/UserRoom";
 import { SettingIcon } from "@components/icons";
