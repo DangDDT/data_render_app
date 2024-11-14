@@ -214,15 +214,6 @@ const WelcomePage = () => {
         overrideClassName="rounded-md border-8 border-[#4ffc92] bg-transparent min-w-[40%] p-2"
       >
         <div className="flex w-full flex-col items-center justify-center gap-2 rounded-md bg-[#00672B] p-4">
-          <div onClick={hideWelcomeUserModel}>
-            <img
-              className="relative my-auto ml-8 animate-scale transition-transform duration-500"
-              src={WelcomeUserIcon}
-              alt="Welcome user"
-              width="400"
-              height="400"
-            />
-          </div>
           <div className="text-center text-2xl font-medium text-white">
             Cảm ơn bạn
           </div>
@@ -233,7 +224,16 @@ const WelcomePage = () => {
             {newUser?.name}
           </div>
           <div className="text-center text-2xl font-medium text-white">
-            đã góp <span>vi mạch</span> quý giá vào <span>bảng mạch xanh</span>.
+            đã góp <span>vi mạch</span> quý giá vào <span>bảng mạch xanh</span>
+          </div>
+          <div onClick={hideWelcomeUserModel}>
+            <img
+              className="relative my-auto ml-8 animate-scale transition-transform duration-500"
+              src={WelcomeUserIcon}
+              alt="Welcome user"
+              width="400"
+              height="400"
+            />
           </div>
         </div>
       </WelcomeUserModal>
