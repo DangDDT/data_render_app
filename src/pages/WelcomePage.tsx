@@ -213,7 +213,7 @@ const WelcomePage = () => {
         hasCloseButton={false}
         overrideClassName="rounded-md border-8 border-[#4ffc92] bg-transparent min-w-[40%] p-2"
       >
-        <div className="flex w-full flex-col items-center justify-center gap-5 rounded-md bg-[#00672B] p-4">
+        <div className="flex w-full flex-col items-center justify-center gap-2 rounded-md bg-[#00672B] p-4">
           <div onClick={hideWelcomeUserModel}>
             <img
               className="relative my-auto ml-8 animate-scale transition-transform duration-500"
