@@ -386,7 +386,7 @@ const WelcomePage: React.FC = () => {
         </div>
         <div>
           <h1 className="mt-5 text-center text-2xl text-white">
-            Tổng số:
+            Tổng số vi mạch:
             <span className="mt-5 text-center text-2xl text-blue-500">
               {" "}
               {users.length}
